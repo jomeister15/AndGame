@@ -5,6 +5,7 @@ import javax.microedition.khronos.opengles.GL10;
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.BoundCamera;
 import org.anddev.andengine.engine.camera.Camera;
+import org.anddev.andengine.engine.camera.hud.HUD;
 import org.anddev.andengine.engine.camera.hud.controls.BaseOnScreenControl;
 import org.anddev.andengine.engine.camera.hud.controls.BaseOnScreenControl.IOnScreenControlListener;
 import org.anddev.andengine.engine.camera.hud.controls.DigitalOnScreenControl;
@@ -12,8 +13,10 @@ import org.anddev.andengine.engine.handler.physics.PhysicsHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.anddev.andengine.entity.layer.tiled.tmx.TMXLoader.ITMXTilePropertiesListener;
+import org.anddev.andengine.entity.layer.tiled.tmx.*;
+import org.anddev.andengine.entity.layer.tiled.tmx.util.exception.TMXLoadException;
 import org.anddev.andengine.entity.scene.Scene;
-import org.anddev.andengine.entity.scene.background.ColorBackground;
 import org.anddev.andengine.entity.sprite.AnimatedSprite;
 import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.opengl.texture.TextureOptions;
@@ -22,6 +25,7 @@ import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextur
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
+import org.anddev.andengine.util.Debug;
 
 
 
@@ -39,7 +43,10 @@ public class AndEngineGame extends BaseGameActivity {
     private TextureRegion mOnScreenControlBaseTextureRegion;
     private TextureRegion mOnScreenControlKnobTextureRegion;
     private DigitalOnScreenControl mDigitalOnScreenControl;
-   
+    private HUD mHUD;
+    private TMXTiledMap mTMXTiledMap;
+
+
     private enum AdventurerDirection {
         
            UP,
@@ -57,11 +64,14 @@ public class AndEngineGame extends BaseGameActivity {
     //definitely not a method
     
     @Override       
-    public Engine onLoadEngine() { //TODO: Find a way to make Bound Camera Work
-        //setup screen
-        this.mCamera = new Camera(0, 0, cam_width, cam_height );
+    public Engine onLoadEngine() { 
+        //setup camera
+
+        this.mBoundChaseCamera = new BoundCamera(0, 0, cam_width, cam_height);
         return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, 
-        new RatioResolutionPolicy(cam_width, cam_height), this.mCamera));
+        new RatioResolutionPolicy(cam_width, cam_height), this.mBoundChaseCamera));
+   
+    
     }
     @Override
     public void onLoadResources() {
@@ -85,7 +95,30 @@ public class AndEngineGame extends BaseGameActivity {
         this.mEngine.registerUpdateHandler(new FPSLogger());
                 //load scene
                 final Scene scene = new Scene();
-                scene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
+                
+                //try to load tmx
+                try {
+                final TMXLoader tmxLoader = new TMXLoader(this, this.mEngine.getTextureManager(), 
+                TextureOptions.BILINEAR_PREMULTIPLYALPHA, new ITMXTilePropertiesListener() {
+                                @Override
+                public void onTMXTileWithPropertiesCreated(final TMXTiledMap pTMXTiledMap, 
+                                final TMXLayer pTMXLayer, final TMXTile pTMXTile, 
+                                final TMXProperties<TMXTileProperty> pTMXTileProperties) {}
+                        });
+                        this.mTMXTiledMap = tmxLoader.loadFromAsset(this, "tmx/desert.tmx");
+
+                //catch error
+                } catch (final TMXLoadException tmxle) {
+                        Debug.e(tmxle);
+                }
+                
+                //attaching thing ftw
+                final TMXLayer tmxLayer = this.mTMXTiledMap.getTMXLayers().get(0);
+                
+               
+                scene.attachChild(tmxLayer);
+
+               
                 
                 //get center of screen
                 final int centerX = (cam_width - this.mAdventurerTextureRegion.getTileWidth()) / 2;
@@ -97,20 +130,24 @@ public class AndEngineGame extends BaseGameActivity {
                 
                 
                 //make the camera follow the sprite    
-                //this.mBoundChaseCamera.setChaseEntity(snapdragon);
+                this.mBoundChaseCamera.setChaseEntity(adventurer);
+                //commented out until solution for chase camera is found
+                
+                
                 
                 //attach sprite to scene
                 scene.attachChild(adventurer);
 
                 
-                //physics for the snapdragon
+                //physics for the adventurer
                 final PhysicsHandler physicsHandler = new PhysicsHandler(adventurer);
                 adventurer.registerUpdateHandler(physicsHandler);
 
                 
+                
                 //getting touchpad to work
                 this.mDigitalOnScreenControl = new DigitalOnScreenControl(0, cam_height - this.mOnScreenControlBaseTextureRegion.getHeight(), 
-                this.mCamera, this.mOnScreenControlBaseTextureRegion, this.mOnScreenControlKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
+                this.mBoundChaseCamera, this.mOnScreenControlBaseTextureRegion, this.mOnScreenControlKnobTextureRegion, 0.1f, new IOnScreenControlListener() {
                         @Override
                         public void onControlChange(final BaseOnScreenControl pBaseOnScreenControl, 
                         final float pValueX, final float pValueY) {
@@ -146,7 +183,7 @@ public class AndEngineGame extends BaseGameActivity {
                                               adventurerDirection = AdventurerDirection.NONE;
                                         }
                                 }
-                                physicsHandler.setVelocity(pValueX * 100, pValueY * 100);
+                                physicsHandler.setVelocity(pValueX * 1000, pValueY * 1000);
                         }
                         
                         
@@ -159,6 +196,10 @@ public class AndEngineGame extends BaseGameActivity {
                 this.mDigitalOnScreenControl.getControlKnob().setScale(1.25f);
                 this.mDigitalOnScreenControl.refreshControlKnobPosition();
 
+                
+                
+
+                
                 scene.setChildScene(this.mDigitalOnScreenControl);
 
                 return scene;
