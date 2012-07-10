@@ -1,7 +1,7 @@
 package com.jomeister;
 //imports
 
-import javax.microedition.khronos.opengles.GL10; //lolthissucks
+import javax.microedition.khronos.opengles.GL10;
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.BoundCamera;
 import org.anddev.andengine.engine.camera.Camera;
@@ -27,7 +27,7 @@ import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 import org.anddev.andengine.util.Debug;
 
-//test test test
+
 
 public class AndEngineGame extends BaseGameActivity {
 
