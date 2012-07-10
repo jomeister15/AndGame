@@ -1,7 +1,7 @@
 package com.jomeister;
 //imports
 
-import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.GL10; //lolthissucks
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.BoundCamera;
 import org.anddev.andengine.engine.camera.Camera;
