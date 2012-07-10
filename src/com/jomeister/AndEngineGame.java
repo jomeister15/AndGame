@@ -59,9 +59,7 @@ public class AndEngineGame extends BaseGameActivity {
     private AdventurerDirection adventurerDirection = AdventurerDirection.DOWN;
     
     //methods to be called later
-    //probably a method
-    //maybe a method?
-    //definitely not a method
+    
     
     @Override       
     public Engine onLoadEngine() { 
