@@ -181,7 +181,8 @@ public class AndEngineGame extends BaseGameActivity {
                                               adventurerDirection = AdventurerDirection.NONE;
                                         }
                                 }
-                                physicsHandler.setVelocity(pValueX * 1000, pValueY * 1000);
+                                //super sayain
+                                physicsHandler.setVelocity(pValueX * 100, pValueY * 100);
                         }
                         
                         
