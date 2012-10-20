@@ -116,7 +116,7 @@ public class AndEngineGame extends BaseGameActivity {
                
                 scene.attachChild(tmxLayer);
 
-               
+               //yo i commited this shit
                 
                 //get center of screen
                 final int centerX = (cam_width - this.mAdventurerTextureRegion.getTileWidth()) / 2;
