@@ -1,2 +1,2 @@
-C:\Users\joey\Documents\NetBeansProjects\AndEngineGame\bin\AndroidManifest.xml : \
-C:\Users\joey\Documents\NetBeansProjects\AndEngineGame\AndroidManifest.xml \
+C:\Users\Sam\Documents\NetBeansProjects\AndGame\bin\AndroidManifest.xml : \
+C:\Users\Sam\Documents\NetBeansProjects\AndGame\AndroidManifest.xml \
